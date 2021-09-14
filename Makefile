@@ -17,10 +17,10 @@ $(OBJ_DIR) :
 	mkdir -p $(OBJ_DIR)
 
 $(NAME) : $(OBJ_DIR) $(OBJ)
-	gcc $(FLAGS) -o $@ $^
+	gcc $(FLAGS) -o $@ $^ -I ./includes/
 
 $(OBJ_DIR)%.o : $(SRC_DIR)%.c $(HEADER_DIR)$(HEADERS)
-	gcc $(FLAGS) -c $< -o $@
+	gcc $(FLAGS) -c $< -o $@ -I ./includes/
 
 clean	:
 	rm -rf $(OBJ_DIR)
