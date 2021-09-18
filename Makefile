@@ -4,10 +4,10 @@ HEADER_DIR	= includes/
 HEADERS		= philo.h
 
 SRC_DIR		= source/
-SRC			= philosopher.c logger.c list.c main.c utils.c
+SRC		= main.c utils.c list.c
 
 OBJ_DIR		= objects/
-OBJ			= $(addprefix $(OBJ_DIR), $(SRC:.c=.o))
+OBJ		= $(addprefix $(OBJ_DIR), $(SRC:.c=.o))
 
 FLAGS		= -Werror -Wall -Wextra
 
@@ -16,11 +16,11 @@ all	: $(OBJ_DIR) $(NAME)
 $(OBJ_DIR) :
 	mkdir -p $(OBJ_DIR)
 
-$(NAME) : $(OBJ_DIR) $(OBJ)
-	gcc $(FLAGS) -o $@ $^ -I ./includes/
-
+$(NAME) : $(OBJ)
+	gcc -o $@ $^
 $(OBJ_DIR)%.o : $(SRC_DIR)%.c $(HEADER_DIR)$(HEADERS)
-	gcc $(FLAGS) -c $< -o $@ -I ./includes/
+	gcc $(FLAGS) -c $< -o $@ -I $(HEADER_DIR)
+
 
 clean	:
 	rm -rf $(OBJ_DIR)

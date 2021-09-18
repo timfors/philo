@@ -1,10 +1,12 @@
 #ifndef PHILO_H
 # define PHILO_H
+# define LOG_DELAY 5
 
 # include <unistd.h>
 # include <stdlib.h>
 # include <pthread.h>
-# include <sus/time.h>
+# include <sys/time.h>
+# include <stdio.h>
 
 typedef struct s_list_el
 {
@@ -18,12 +20,13 @@ typedef struct s_list
 	int		size;
 	t_list_el	*start;
 	t_list_el	*end;
-}
+}			t_list;
 
 typedef struct s_logger
 {
 	void	*mut;
-	t_list	*message_order;
+	t_list	*messages;
+	int	is_work;
 }		t_logger;
 
 typedef struct s_params
@@ -45,11 +48,14 @@ typedef struct s_philo
 	t_params	params;
 	void	*fork_r;
 	void	*forl_l;
-}		t_philo
+}		t_philo;
 
-t_list		*list_create(void *content);
+t_list		*list_create();
 int		list_add(t_list *lst, void *content);
-void		list_clear(t_list **lst, void (*del)(void *));
-void		list_remove(t_list *lst, t_list_el el, void (*del)(void *));
+void		list_clear(t_list *lst, void (*del)(void *));
+void		list_remove(t_list *lst, t_list_el *el, void (*del)(void *));
 
 void	init_philo(int name, t_params params);
+
+void	*m_calloc(int size);
+#endif
