@@ -26,12 +26,36 @@ int	str_len(char *str)
 	return (size);
 }
 
+char	*itoa(int num)
+{
+	char	*res;
+	int	size;
+	int	tmp;
+
+	tmp = num;
+	size = 1;
+	while (tmp > 10)
+	{
+		tmp /= 10;
+		size++;
+	}
+	res = m_calloc(size + 1);
+	if (!res)
+		return (0);
+	while (--size >= 0)
+	{
+		res[size] = num % 10;
+		num /= 10;
+	}
+	return (res);
+}
+
 char	*str_dub(const char *str)
 {
 	char	*res;
 	int	len_str;
 
-	len_str = str_len(str);
+	len_str = str_len((char *)str);
 	res = m_calloc(len_str + 1);
 	if (!res)
 		return (0);

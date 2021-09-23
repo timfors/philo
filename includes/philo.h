@@ -24,7 +24,6 @@ typedef struct s_list
 
 typedef struct s_logger
 {
-	void	*mut;
 	t_list	*messages;
 	int	is_work;
 }		t_logger;
@@ -55,7 +54,15 @@ int		list_add(t_list *lst, void *content);
 void		list_clear(t_list *lst, void (*del)(void *));
 void		list_remove(t_list *lst, t_list_el *el, void (*del)(void *));
 
-void	init_philo(int name, t_params params);
+t_logger	*log_create();
+int		log_msg(t_logger *log, const char *str);
+int		log_last(t_logger *log, const char *str);
+void		*log_monitor(void *log);
 
-void	*m_calloc(int size);
+//void		init_philo(int name, t_params params);
+
+int		str_len(char *str);
+char		*str_dub(const char *str);
+char		*itoa(int num);
+void		*m_calloc(int size);
 #endif
