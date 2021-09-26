@@ -44,7 +44,7 @@ char	*itoa(int num)
 		return (0);
 	while (--size >= 0)
 	{
-		res[size] = num % 10;
+		res[size] = num % 10 + '0';
 		num /= 10;
 	}
 	return (res);

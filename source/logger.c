@@ -5,21 +5,19 @@ void	*log_monitor(void *data)
 	t_list		*messages;
 	t_logger	*logger;
 
-	printf("First\n");
 	logger = (t_logger *)data;
 	if (!logger)
 		return (0);
 	messages = logger->messages;
 	while (logger->is_work)
 	{
-		if (messages->size)
+		if (messages->size > 0)
 		{
 			printf("%s\n", (char *)messages->start->content);
 			list_remove(messages, messages->start, free);
 		}
-		usleep(LOG_DELAY);
 	}
-	if (messages->size)
+	if (messages->size > 0)
 	{
 		printf("%s\n", (char *)messages->start->content);
 		list_remove(messages, messages->start, free);
@@ -35,6 +33,8 @@ t_logger	*log_create()
 	if (!res)
 		return (0);
 	res->messages = list_create();
+	if (!res->messages)
+		return (0);
 	res->is_work = 1;
 	return (res);
 }

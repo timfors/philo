@@ -1,18 +1,5 @@
 #include "philo.h"
 
-t_list_el	*el_create(void *content)
-{
-	t_list_el	*res;
-
-	res = m_calloc(sizeof(t_list_el));
-	if (!res)
-		return (0);
-	res->content = content;
-	res->next = res;
-	res->prev = res;
-	return (res);
-}
-
 t_list	*list_create()
 {
 	t_list		*res;
@@ -20,6 +7,11 @@ t_list	*list_create()
 	res = m_calloc(sizeof(t_list));
 	if (!res)
 		return (0);
+	if (pthread_mutex_init(&res->mutex, 0))
+	{
+		free(res);
+		return (0);
+	}
 	return (res);
 }
 
@@ -32,15 +24,11 @@ int	list_add(t_list *lst, void *content)
 	new_el = el_create(content);
 	if (!new_el)
 		return (0);
+	pthread_mutex_lock(&lst->mutex);
 	if (lst->size == 0)
 	{
 		lst->start = new_el;
 		lst->end = new_el;
-	}
-	else if (lst->size == 1)
-	{
-		lst->start->next = new_el;
-		new_el->prev = lst->start;
 	}
 	new_el->prev = lst->end;
 	new_el->next = lst->start;
@@ -48,6 +36,7 @@ int	list_add(t_list *lst, void *content)
 	lst->end->next = new_el;
 	lst->end = new_el;
 	lst->size++;
+	pthread_mutex_unlock(&lst->mutex);
 	return (1);
 }
 
@@ -56,6 +45,7 @@ void	list_clear(t_list *lst, void (*del)(void *))
 	t_list_el	*current;
 	t_list_el	*next;
 
+	pthread_mutex_lock(&lst->mutex);
 	current = lst->start;
 	while (lst->size--)
 	{
@@ -67,6 +57,7 @@ void	list_clear(t_list *lst, void (*del)(void *))
 	lst->size = 0;
 	lst->start = 0;
 	lst->end = 0;
+	pthread_mutex_unlock(&lst->mutex);
 }
 
 void	list_remove(t_list *lst, t_list_el *el, void (*del)(void *))
@@ -74,6 +65,7 @@ void	list_remove(t_list *lst, t_list_el *el, void (*del)(void *))
 	t_list_el	*tmp;
 	int		i;
 
+	pthread_mutex_lock(&lst->mutex);
 	i = 0;
 	tmp = lst->start;
 	while (i < lst->size)
@@ -89,9 +81,18 @@ void	list_remove(t_list *lst, t_list_el *el, void (*del)(void *))
 				lst->end = tmp->prev;
 			del(tmp->content);
 			free(tmp);
+			pthread_mutex_unlock(&lst->mutex);
 			return ;
-
 		}
 		tmp = tmp->next;
 	}
+	pthread_mutex_unlock(&lst->mutex);
+}
+
+void	list_destroy(t_list **lst, void (*del)(void *))
+{
+	list_clear(*lst, del);
+	pthread_mutex_destroy((*lst)->mutex);
+	free(*lst);
+	*lst = 0;
 }
