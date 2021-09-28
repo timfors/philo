@@ -92,7 +92,7 @@ void	list_remove(t_list *lst, t_list_el *el, void (*del)(void *))
 void	list_destroy(t_list **lst, void (*del)(void *))
 {
 	list_clear(*lst, del);
-	pthread_mutex_destroy((*lst)->mutex);
+	pthread_mutex_destroy(&(*lst)->mutex);
 	free(*lst);
 	*lst = 0;
 }

@@ -63,3 +63,24 @@ char	*str_dub(const char *str)
 		res[len_str] = str[len_str];
 	return (res);
 }
+
+char	*str_concat(char *str1, char *str2, char div)
+{
+	char	*res;
+	int	i;
+	int	len1;
+	int	len2;
+
+	len1 = str_len(str1);
+	len2 = str_len(str2);
+	res = m_calloc(len1 + len2 + 2);
+	if (!res)
+		return (0);
+	i = -1;
+	while (++i < len1)
+		res[i] = str1[i];
+	res[i] = div;
+	while (++i < len1 + len2 + 1)
+		res[i] = str2[i - len1 - 1];
+	return (res);
+}

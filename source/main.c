@@ -1,48 +1,58 @@
 #include "philo.h"
 
-void	*log_something(void *data)
+static void	start_threads(t_logger *logger, t_params params, int philo_count)
 {
-	static int	i = 1;
-	int		res;
-	int		num = i++;
-	char		*str;
-	t_logger	*log;
+	pthread_t	*philo_threads;
+	t_list		*forks;
+	t_philo		*philos;
 
-	log = (t_logger *)data;
-	printf("NUM %d is cheaking log state %d\n", num, log->is_work);
-	while (log->is_work)
-	{
-		str = itoa(num);
-		res = log_msg(log, str);
-		free(str);
-		if (res == 0)
-		{
-			printf("%d: Log Error!\n", num);
-			return (0);
-		}
-		usleep(1000000);
-	}
-	return (0);
+	philos = philos_create(philo_count, params);
+	if (!philos)
+		return ;
+	forks = forks_create(philo_count);
+	if (!forks)
+		return ;
+	forks_put_on_table(philos, forks);
+	philo_threads = m_calloc(philo_count);
+	if (!philo_threads)
+		return ;
+	while (--philo_count >= 0)
+		pthread_create(philo_threads + philo_count,
+			0, philo_actions, philos + philo_count);
+	while (logger->is_work)
+		;
+	usleep(100000);
+	list_destroy(&forks, fork_delete);
+	free(philos);
+	free(philo_threads);
+	logger_delete(&logger);
 }
 
-int	main()
+int	main(int argc , char **argv)
 {
-	pthread_t	threads[4];
-	t_logger	*log;
+	int		philo_count;
+	t_params	params;
+	t_logger	*logger;
+	pthread_t	logger_thread;
 
-	log = log_create();
-	if (!log)
+	if (argc != 5 && argc != 6)
+	{
+		printf("Usage: ./philo philo_count time_to_die time_to_eat time_to_sleep [number_of_times_each_philosopher_must_eat]\n");
+		return (0);
+	}
+	if (argc == 5)
+		params = params_init(argv[2], argv[3], argv[4], 0);
+	else
+		params = params_init(argv[2], argv[3], argv[4], argv[5]);
+	philo_count = to_num(argv[1]);
+	logger = logger_create();
+	if (!logger)
 	{
 		printf("Log Error!\n");
-		exit(0);
+		return (0);
 	}
-	log_msg(log, "Start!\n");
-	pthread_create(threads, 0, log_monitor, log);
-	pthread_create(threads + 1, 0, log_something, log);
-	pthread_create(threads + 2, 0, log_something, log);
-	pthread_create(threads + 3, 0, log_something, log);
-	usleep(5000000);
-	log_last(log, "Done!");
-	usleep(100);
-	exit(0);
+	params.logger = logger;
+	pthread_create(&logger_thread, 0, logger_monitor, logger);
+	start_threads(logger, params, philo_count);
+	return (0);
 }

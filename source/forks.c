@@ -1,20 +1,20 @@
-#include "philo.c"
+#include "philo.h"
 
 void	fork_delete(void *data)
 {
-	pthread_mutex	*fork;
+	pthread_mutex_t	*fork;
 
-	fork = (pthread_mutex *)data;
-	pthread_mutex_detroy(fork);
+	fork = (pthread_mutex_t *)data;
+	pthread_mutex_destroy(fork);
 	free(data);
 
 }
 
-pthread_mutex	*fork_create()
+pthread_mutex_t	*fork_create()
 {
-	pthread_mutex	*res;
+	pthread_mutex_t	*res;
 
-	res = ft_calloc(sizeof(pthread_mutex));
+	res = m_calloc(sizeof(pthread_mutex_t));
 	if (!res)
 		return (0);
 	if (pthread_mutex_init(res, 0))
@@ -28,7 +28,7 @@ pthread_mutex	*fork_create()
 t_list	*forks_create(int count)
 {
 	t_list		*res;
-	pthread_mutex	*fork;
+	pthread_mutex_t	*fork;
 	int		i;
 
 	res = list_create();
@@ -40,11 +40,12 @@ t_list	*forks_create(int count)
 		fork = fork_create();
 		if (!fork || !list_add(res, fork))
 		{
-			list_destroy(&lst, fork_delete);
+			list_destroy(&res, fork_delete);
 			return (0);
 		}
 		i++;
 	}
+	return (res);
 }
 
 void	forks_put_on_table(t_philo *philos, t_list *forks)
@@ -54,7 +55,7 @@ void	forks_put_on_table(t_philo *philos, t_list *forks)
 
 	i = 0;
 	current = forks->start;
-	while (i < forks->size && philos[i])
+	while (i < forks->size)
 	{
 		philos[i].fork_l = current->content;
 		philos[i].fork_r = current->prev->content;

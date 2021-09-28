@@ -1,4 +1,4 @@
-#inlcude "philo.h"
+#include "philo.h"
 
 t_list_el	*el_create(void *content)
 {
