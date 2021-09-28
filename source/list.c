@@ -47,12 +47,15 @@ void	list_clear(t_list *lst, void (*del)(void *))
 
 	pthread_mutex_lock(&lst->mutex);
 	current = lst->start;
-	while (lst->size--)
+	printf("Clear: %d el\n", lst->size);
+	while (lst->size)
 	{
 		next = current->next;
+		printf("\tC: %p\tN: %p\n", current, next);
 		del(current->content);
 		free(current);
 		current = next;
+		lst->size--;
 	}
 	lst->size = 0;
 	lst->start = 0;

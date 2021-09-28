@@ -21,7 +21,7 @@ static void	start_threads(t_logger *logger, t_params params, int philo_count)
 			0, philo_actions, philos + philo_count);
 	while (logger->is_work)
 		;
-	usleep(100000);
+	usleep(1000000);
 	list_destroy(&forks, fork_delete);
 	free(philos);
 	free(philo_threads);
@@ -54,5 +54,6 @@ int	main(int argc , char **argv)
 	params.logger = logger;
 	pthread_create(&logger_thread, 0, logger_monitor, logger);
 	start_threads(logger, params, philo_count);
+	while (1);
 	return (0);
 }

@@ -6,8 +6,7 @@ void	fork_delete(void *data)
 
 	fork = (pthread_mutex_t *)data;
 	pthread_mutex_destroy(fork);
-	free(data);
-
+	free(fork);
 }
 
 pthread_mutex_t	*fork_create()

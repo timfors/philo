@@ -55,7 +55,6 @@ int	logger_last(t_logger *logger, t_log *log)
 	if (!logger->is_work)
 		return (-1);
 	logger->is_work = 0;
-	//list_clear(logger->logs, log_delete);
 	if (!log || !list_add(logger->logs, log))
 		return (0);
 	return (1);

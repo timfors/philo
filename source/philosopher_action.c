@@ -16,7 +16,7 @@ static void	*philo_check_death(void *data)
 			- philo->last_eat > params.die_time
 			&& philo->state != 1)
 		{
-			log = log_create(get_time() - philo->start_time,
+			log = log_create(get_time(),
 				philo->name, "died");
 			logger_last(logger, log);
 		}
@@ -30,14 +30,20 @@ static void	philo_eat(t_philo *philo)
 	t_logger	*logger;
 
 	logger = philo->params.logger;
-	pthread_mutex_lock(philo->fork_r);
+	if (philo->name % 2)
+		pthread_mutex_lock(philo->fork_r);
+	else
+		pthread_mutex_lock(philo->fork_l);
 	log = log_create(get_time() - philo->start_time, philo->name, "has taken fork");
 	logger_add(logger, log);
-	pthread_mutex_lock(philo->fork_l);
+	if (philo->name % 2)
+		pthread_mutex_lock(philo->fork_l);
+	else
+		pthread_mutex_lock(philo->fork_r);
 	philo->state = 1;
-	log = log_create(get_time() - philo->start_time, philo->name, "has taken fork");
+	log = log_create(get_time(), philo->name, "has taken fork");
 	logger_add(logger, log);
-	log = log_create(get_time() - philo->start_time, philo->name, "is eating");
+	log = log_create(get_time(), philo->name, "is eating");
 	logger_add(logger, log);
 	usleep(philo->params.eat_time * 1000);
 	if (philo->params.eat_count > 0)
@@ -54,7 +60,7 @@ static void	philo_sleep(t_philo *philo)
 
 	logger = philo->params.logger;
 	philo->state= 2;
-	log = log_create(get_time() - philo->start_time, philo->name, "is sleeping");
+	log = log_create(get_time(), philo->name, "is sleeping");
 	logger_add(logger, log);
 	usleep(philo->params.sleep_time * 1000);
 }
@@ -66,7 +72,7 @@ static void	philo_think(t_philo *philo)
 
 	logger = philo->params.logger;
 	philo->state = 3;
-	log = log_create(get_time() - philo->start_time, philo->name, "is thinking");
+	log = log_create(get_time(), philo->name, "is thinking");
 	logger_add(logger, log);
 }
 
