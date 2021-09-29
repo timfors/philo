@@ -4,7 +4,6 @@ void	*logger_monitor(void *data)
 {
 	t_list		*logs;
 	t_logger	*logger;
-	t_log		*log;
 
 	logger = (t_logger *)data;
 	if (!logger)
@@ -12,18 +11,24 @@ void	*logger_monitor(void *data)
 	logs = logger->logs;
 	while (logger->is_work)
 	{
-		if (logs->size > 0)
+		if (logger->last != logs->end)
 		{
-			log = (t_log *)logs->start->content;
-			printf("%d %d %s\n", log->timestamp, log->name, log->msg);
-			list_remove(logs, logs->start, log_delete);
+			if (!logger->last)
+			{
+				logger->last = logs->start;
+				log_print(logger->last);
+
+			}
+			else if (logger->last->next != logs->start)
+			{
+				logger->last = logger->last->next;
+				log_print(logger->last);
+			}
 		}
 	}
-	while (logs->size == 0)
+	while (logs->end == logger->last)
 		;
-	log = (t_log *)logs->end->content;
-	printf("%d %d %s\n", log->timestamp, log->name, log->msg);
-	list_clear(logs, log_delete);
+	log_print(logs->end);
 	return (0);
 }
 
@@ -43,6 +48,8 @@ t_logger	*logger_create()
 
 int	logger_add(t_logger *logger, t_log *log)
 {
+	if (!logger)
+		return (0);
 	if (!logger->is_work)
 		return (-1);
 	if (!log || !list_add(logger->logs, log))
@@ -52,6 +59,8 @@ int	logger_add(t_logger *logger, t_log *log)
 
 int	logger_last(t_logger *logger, t_log *log)
 {
+	if (!logger)
+		return (0);
 	if (!logger->is_work)
 		return (-1);
 	logger->is_work = 0;

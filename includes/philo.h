@@ -33,8 +33,9 @@ typedef struct s_log
 
 typedef struct s_logger
 {
-	t_list	*logs;
-	int	is_work;
+	t_list		*logs;
+	t_list_el	*last;
+	int		is_work;
 }		t_logger;
 
 typedef struct s_params
@@ -52,6 +53,7 @@ typedef struct s_philo
 	int		name;
 	int		state;
 	int		last_eat;
+	int		dinner_count;
 	int		start_time;
 	t_params	params;
 	pthread_mutex_t	*fork_r;
@@ -67,6 +69,7 @@ void		list_remove(t_list *lst, t_list_el *el, void (*del)(void *));
 void		list_destroy(t_list **lst, void (*del)(void *));
 
 t_log		*log_create(int timestamp, int name, const char *msg);
+void		log_print(t_list_el *el);
 void		log_delete(void *log);
 
 t_logger	*logger_create(void);
@@ -85,6 +88,7 @@ t_params	params_init(char *die_time, char *eat_time, char *sleep_time, char *eat
 void		philo_init(t_philo *philo, int name, t_params params);
 t_philo		*philos_create(int count, t_params params);
 void		*philo_actions(void *data);
+int		philo_check(t_philo *philo);
 
 int		get_time(void);
 int		str_len(char *str);

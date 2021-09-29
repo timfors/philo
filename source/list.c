@@ -18,6 +18,7 @@ t_list	*list_create()
 int	list_add(t_list *lst, void *content)
 {
 	t_list_el	*new_el;
+	t_list_el	*last;
 
 	if (!lst)
 		return (0);
@@ -30,13 +31,14 @@ int	list_add(t_list *lst, void *content)
 		lst->start = new_el;
 		lst->end = new_el;
 	}
-	new_el->prev = lst->end;
-	new_el->next = lst->start;
+	last = lst->end;
 	lst->start->prev = new_el;
-	lst->end->next = new_el;
 	lst->end = new_el;
-	lst->size++;
+	new_el->next = lst->start;
 	pthread_mutex_unlock(&lst->mutex);
+	last->next = new_el;
+	new_el->prev = last;
+	lst->size++;
 	return (1);
 }
 
@@ -47,11 +49,9 @@ void	list_clear(t_list *lst, void (*del)(void *))
 
 	pthread_mutex_lock(&lst->mutex);
 	current = lst->start;
-	printf("Clear: %d el\n", lst->size);
 	while (lst->size)
 	{
 		next = current->next;
-		printf("\tC: %p\tN: %p\n", current, next);
 		del(current->content);
 		free(current);
 		current = next;
@@ -68,13 +68,13 @@ void	list_remove(t_list *lst, t_list_el *el, void (*del)(void *))
 	t_list_el	*tmp;
 	int		i;
 
-	pthread_mutex_lock(&lst->mutex);
 	i = 0;
 	tmp = lst->start;
 	while (i < lst->size)
 	{
 		if (tmp == el)
 		{
+			pthread_mutex_lock(&lst->mutex);
 			lst->size--;
 			tmp->prev->next = tmp->next;
 			tmp->next->prev = tmp->prev;
@@ -89,7 +89,6 @@ void	list_remove(t_list *lst, t_list_el *el, void (*del)(void *))
 		}
 		tmp = tmp->next;
 	}
-	pthread_mutex_unlock(&lst->mutex);
 }
 
 void	list_destroy(t_list **lst, void (*del)(void *))

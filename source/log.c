@@ -22,6 +22,14 @@ t_log	*log_create(int timestamp, int name, const char *str)
 	return (log);
 }
 
+void	log_print(t_list_el *el)
+{
+	t_log	*log;
+
+	log = (t_log *)el->content;
+	printf("%d %d %s\n", log->timestamp, log->name, log->msg);
+}
+
 void	log_delete(void *data)
 {
 	t_log	*log;
